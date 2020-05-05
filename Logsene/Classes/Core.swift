@@ -1,5 +1,8 @@
 import Foundation
+#if os(macOS)
+#else
 import UIKit
+#endif
 
 /// Alias for dictionary String:AnyObject, but must be a valid json object (enforced in LLogEvent()).
 public typealias JsonObject = [String: Any]
@@ -181,7 +184,10 @@ private func enrichEvent(_ event: inout JsonObject) {
         }
         let os = ProcessInfo.processInfo.operatingSystemVersion
         meta["osRelease"] = "\(os.majorVersion).\(os.minorVersion).\(os.patchVersion)"
+        #if os(macOS)
+        #else
         meta["uuid"] = UIDevice.current.identifierForVendor!.uuidString
+        #endif
         if let defaultMeta = Logsene.defaultMeta {
             for (key, value) in defaultMeta {
                 meta[key] = value
