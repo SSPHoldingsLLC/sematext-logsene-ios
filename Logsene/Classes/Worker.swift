@@ -48,11 +48,14 @@ class Worker: NSObject {
             self.locationManager = CLLocationManager()
             self.locationManager?.delegate = self
             self.locationEnabled = true
+            #if os(macOS)
+            #else
             if useLocationOnlyInForeground {
                 self.locationManager?.requestWhenInUseAuthorization()
             } else {
                 self.locationManager?.requestAlwaysAuthorization()
             }
+            #endif
             self.readInitialLocation()
         }
         
@@ -167,12 +170,15 @@ class Worker: NSObject {
 }
 
 extension Worker: CLLocationManagerDelegate {
+    #if os(macOS)
+    #else
     func locationManager(_ manager: CLLocationManager, didVisit visit: CLVisit) {
         NSLog("Setting location to %d %d", Double(visit.coordinate.latitude),  Double(visit.coordinate.longitude))
         self.locationSet = true
         self.currentLatitude = Double(visit.coordinate.latitude)
         self.currentLongitude = Double(visit.coordinate.longitude)
     }
+    #endif
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if locations.first != nil {
@@ -191,8 +197,11 @@ extension Worker: CLLocationManagerDelegate {
     
     func readInitialLocation() {
         NSLog("Reading initial location")
+        #if os(macOS)
+        #else
         if #available(iOS 9.0, *) {
             self.locationManager?.requestLocation()
         }
+        #endif
     }
 }
